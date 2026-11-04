@@ -7,9 +7,14 @@ server {
     # Proxy vers le backend : le navigateur ne voit qu'une seule origine (cookie SameSite=Strict OK).
     location /api/ {
         proxy_pass ${BACKEND_URL};
-        proxy_set_header Host $host;
+        # Backend en HTTPS (Render) : SNI obligatoire, et Host = nom du backend (sinon Render ne route pas).
+        proxy_ssl_server_name on;
+        proxy_set_header Host $proxy_host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        # Le backend gratuit se met en veille : laisser le temps au démarrage à froid (~1 min).
+        proxy_connect_timeout 60s;
+        proxy_read_timeout 120s;
     }
 
     # Fichiers statiques hashés : cache long.
