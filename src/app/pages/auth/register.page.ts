@@ -10,7 +10,7 @@ import { AuthService } from '../../core/auth.service';
   imports: [ReactiveFormsModule, RouterLink],
   template: `
     <div class="card auth-card">
-      <div class="brand"><span class="brand-mark">▶</span> Show Marker</div>
+      <div class="brand"><img class="brand-mark" src="logo.svg" alt="" width="34" height="34"> Show Marker</div>
       <div>
         <h1>Créer un compte</h1>
         <p class="muted">Suivez vos séries épisode par épisode.</p>

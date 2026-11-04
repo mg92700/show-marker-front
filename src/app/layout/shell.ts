@@ -10,7 +10,7 @@ import { AuthService } from '../core/auth.service';
     <header class="topbar">
       <div class="topbar-inner">
         <a routerLink="/" class="brand" aria-label="Show Marker - accueil">
-          <span class="brand-mark">▶</span> Show Marker
+          <img class="brand-mark" src="logo.svg" alt="" width="28" height="28"> Show Marker
         </a>
         <nav class="nav" aria-label="Navigation principale">
           @for (link of links; track link.path) {
@@ -47,7 +47,7 @@ import { AuthService } from '../core/auth.service';
     .topbar { position: sticky; top: 0; z-index: 20; background: rgba(15, 17, 23, 0.96); border-bottom: 1px solid var(--border); }
     .topbar-inner { max-width: 1200px; margin: 0 auto; height: var(--nav-h); padding: 0 16px; display: flex; align-items: center; gap: 24px; }
     .brand { font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
-    .brand-mark { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--accent); font-size: 0.75rem; color: #fff; }
+    .brand-mark { width: 28px; height: 28px; border-radius: 8px; }
     .nav { display: flex; gap: 4px; flex: 1; }
     .nav a { padding: 8px 14px; border-radius: var(--radius-sm); color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 6px; }
     .nav a:hover { color: var(--text); }
