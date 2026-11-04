@@ -1,0 +1,184 @@
+@if (error()) {
+  <div class="alert alert-error">{{ error() }}</div>
+  <button class="btn section" type="button" (click)="back()">← Retour</button>
+} @else if (show(); as s) {
+  <section class="hero">
+    @if (s.backdropUrl || s.posterUrl) {
+      <div class="hero-bg" [style.background-image]="'url(' + (s.backdropUrl || s.posterUrl) + ')'"></div>
+    }
+    <div class="hero-inner">
+      <div class="hero-poster">
+        <div class="poster">
+          @if (s.posterUrl) {
+            <img [src]="s.posterUrl" [alt]="s.title" />
+          } @else {
+            <div class="poster-fallback">{{ s.title }}</div>
+          }
+        </div>
+      </div>
+
+      <div class="hero-info">
+        <h1>{{ s.title }}</h1>
+        <div class="meta">
+          @if (s.year) {
+            <span>{{ s.year }}</span>
+          }
+          @if (s.network) {
+            <span>· {{ s.network }}</span>
+          }
+          @if (s.status) {
+            <span class="badge">{{ s.ended ? 'Terminée' : s.status === 'Running' ? 'En production' : s.status }}</span>
+          }
+          @if (s.rating) {
+            <span class="badge badge-accent">★ {{ s.rating }}</span>
+          }
+        </div>
+        @if (s.genres.length) {
+          <div class="chips">
+            @for (g of s.genres; track g) {
+              <span class="badge">{{ g }}</span>
+            }
+          </div>
+        }
+        @if (s.overview) {
+          <p class="overview">{{ s.overview }}</p>
+        }
+
+        @if (item(); as it) {
+          <div class="row">
+            <label class="muted small" for="status">Statut</label>
+            <select
+              id="status"
+              class="input status-select"
+              [value]="it.status"
+              [disabled]="busy()"
+              (change)="changeStatus($any($event.target).value)"
+            >
+              @for (st of statuses; track st) {
+                <option [value]="st">{{ label(st) }}</option>
+              }
+            </select>
+            <button class="btn btn-ghost btn-danger btn-sm" type="button" [disabled]="busy()" (click)="remove()">
+              Retirer
+            </button>
+          </div>
+          @if (progress(); as p) {
+            <div class="progress-box">
+              <div class="row small">
+                <strong>{{ p.percent }}%</strong>
+                <span class="muted">{{ p.watched }} / {{ p.total ?? '?' }} épisodes diffusés vus</span>
+              </div>
+              <div class="progress progress-lg"><span [style.width.%]="p.percent"></span></div>
+              @if (p.nextEpisode; as n) {
+                <div class="row next">
+                  <span class="muted small">Prochain épisode :</span>
+                  <span class="badge badge-accent">{{ code(n) }}</span>
+                  <span class="small ellipsis">{{ n.title }}</span>
+                  <button class="btn btn-success btn-sm" type="button" [disabled]="busy()" (click)="toggleEpisode(n)">
+                    ✓ Vu
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        } @else {
+          <div class="row">
+            <button class="btn btn-primary" type="button" [disabled]="busy()" (click)="add('WATCHLIST')">
+              + Ajouter à ma bibliothèque
+            </button>
+            <button class="btn" type="button" [disabled]="busy()" (click)="add('WATCHING')">
+              Je la regarde
+            </button>
+          </div>
+        }
+        @if (actionError()) {
+          <div class="alert alert-error">{{ actionError() }}</div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>Saisons</h2>
+      <span class="muted small">{{ s.seasons.length }} saison(s)</span>
+    </div>
+
+    @if (s.seasons.length === 0) {
+      <div class="empty">Aucun épisode référencé pour cette série.</div>
+    }
+
+    <div class="seasons">
+      @for (season of s.seasons; track season.number) {
+        <div class="card season" [class.open]="openSeason() === season.number">
+          <button class="season-head" type="button" (click)="toggleSeasonOpen(season.number)">
+            <span class="season-title">Saison {{ season.number }}</span>
+            <span class="muted small">{{ seasonWatchedCount(season) }} / {{ season.episodeCount }}</span>
+            <span class="spacer"></span>
+            @if (isSeasonComplete(season)) {
+              <span class="badge badge-accent">Vue</span>
+            }
+            <span class="chevron" aria-hidden="true">{{ openSeason() === season.number ? '▴' : '▾' }}</span>
+          </button>
+
+          @if (openSeason() === season.number) {
+            <div class="season-actions">
+              @if (isSeasonComplete(season)) {
+                <button class="btn btn-sm" type="button" [disabled]="busy()" (click)="markSeason(season, false)">
+                  Tout démarquer
+                </button>
+              } @else {
+                <button
+                  class="btn btn-sm"
+                  type="button"
+                  [disabled]="busy() || seasonAired(season).length === 0"
+                  (click)="markSeason(season, true)"
+                >
+                  ✓ Marquer la saison comme vue
+                </button>
+              }
+            </div>
+            <ul class="episodes">
+              @for (e of season.episodes; track e.externalId) {
+                <li class="episode" [class.watched]="watched().has(e.externalId)" [class.upcoming]="!e.aired">
+                  <button
+                    class="check"
+                    type="button"
+                    [disabled]="busy() || (!e.aired && !watched().has(e.externalId))"
+                    [attr.aria-pressed]="watched().has(e.externalId)"
+                    [attr.aria-label]="(watched().has(e.externalId) ? 'Démarquer ' : 'Marquer comme vu ') + code(e)"
+                    (click)="toggleEpisode(e)"
+                  >
+                    ✓
+                  </button>
+                  <div class="grow">
+                    <div class="ellipsis">
+                      <span class="ep-code">{{ code(e) }}</span> {{ e.title }}
+                    </div>
+                    <div class="muted small">
+                      @if (e.airDate) {
+                        {{ e.aired ? '' : 'Diffusion le ' }}{{ e.airDate | date: 'd MMM y' }}
+                      } @else {
+                        Date inconnue
+                      }
+                      @if (e.runtime) {
+                        · {{ e.runtime }} min
+                      }
+                    </div>
+                  </div>
+                  @if (e.aired && !watched().has(e.externalId)) {
+                    <button class="btn btn-ghost btn-sm upto" type="button" [disabled]="busy()" (click)="markUpTo(e)">
+                      Vu jusqu'ici
+                    </button>
+                  }
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      }
+    </div>
+  </section>
+} @else {
+  <div class="loader"><div class="spinner"></div></div>
+}

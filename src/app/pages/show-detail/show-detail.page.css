@@ -1,0 +1,20 @@
+.status-select { width: auto; padding: 7px 12px; }
+.progress-box { display: flex; flex-direction: column; gap: 8px; max-width: 520px; }
+.next { gap: 8px; }
+.seasons { display: flex; flex-direction: column; gap: 10px; }
+.season { padding: 0; overflow: hidden; }
+.season-head { width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: none; border: none; color: inherit; font: inherit; cursor: pointer; text-align: left; }
+.season-title { font-weight: 700; }
+.season-actions { padding: 0 18px 10px; }
+.episodes { list-style: none; margin: 0; padding: 0 8px 8px; }
+.episode { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: var(--radius-sm); }
+.episode:hover { background: var(--bg-elev-2); }
+.episode.upcoming { opacity: 0.55; }
+.ep-code { font-weight: 700; color: var(--text-muted); margin-right: 4px; font-variant-numeric: tabular-nums; }
+.check { width: 32px; height: 32px; flex-shrink: 0; border-radius: 50%; border: 2px solid var(--border); background: transparent; color: transparent; font-weight: 800; cursor: pointer; transition: all 0.15s; }
+.check:hover:not(:disabled) { border-color: var(--success); color: var(--success); }
+.check:disabled { cursor: not-allowed; }
+.episode.watched .check { background: var(--success); border-color: var(--success); color: #062b16; }
+.upto { opacity: 0; }
+.episode:hover .upto, .upto:focus { opacity: 1; }
+@media (hover: none) { .upto { opacity: 1; } }
