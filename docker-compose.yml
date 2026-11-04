@@ -1,0 +1,12 @@
+# Lancement : docker compose up -d --build   -> http://localhost:4200
+# Le backend (show-marker-back) doit tourner sur la machine hôte (port 8080), via son propre docker compose.
+services:
+  front:
+    build: .
+    container_name: show-marker-front
+    environment:
+      BACKEND_URL: ${BACKEND_URL:-http://host.docker.internal:8080}
+    ports:
+      - "4200:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
