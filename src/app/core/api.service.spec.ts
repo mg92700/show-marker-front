@@ -97,6 +97,14 @@ describe('ApiService', () => {
     api.dashboard().subscribe();
     http.expectOne('/api/dashboard').flush({});
   });
+
+  it('publie un commentaire sur un titre de la bibliothèque', () => {
+    api.comment(5, 'Top').subscribe();
+    const req = http.expectOne('/api/library/5/comments');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ text: 'Top' });
+    req.flush(null);
+  });
 });
 
 describe('errorMessage', () => {

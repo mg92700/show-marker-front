@@ -5,10 +5,11 @@ import { Observable, forkJoin, map, switchMap } from 'rxjs';
 import { ApiService, errorMessage } from '../../core/api.service';
 import { statusLabel } from '../../core/labels';
 import { LibraryEntry, LibraryItem, LibraryStatus, MovieDetails } from '../../core/models';
+import { CommentBox } from '../../shared/comment-box';
 
 @Component({
   selector: 'app-movie-detail-page',
-  imports: [DatePipe],
+  imports: [DatePipe, CommentBox],
   template: `
     @if (error()) {
       <div class="alert alert-error">{{ error() }}</div>
@@ -84,6 +85,11 @@ import { LibraryEntry, LibraryItem, LibraryStatus, MovieDetails } from '../../co
                 </button>
               }
             </div>
+            @if (item(); as it) {
+              @if (it.status === 'WATCHED') {
+                <app-comment-box [itemId]="it.id" />
+              }
+            }
             @if (actionError()) {
               <div class="alert alert-error">{{ actionError() }}</div>
             }

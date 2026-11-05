@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { errorMessage } from './api.service';
-import { episodeCode, statusLabel } from './labels';
+import { activityLabel, episodeCode, statusLabel } from './labels';
 
 describe('labels', () => {
   it('formate les codes épisode', () => {
@@ -12,6 +12,10 @@ describe('labels', () => {
   it('traduit les statuts selon le type', () => {
     expect(statusLabel('WATCHING')).toBe('En cours');
     expect(statusLabel('WATCHED', 'MOVIE')).toBe('Vu');
+  });
+
+  it('décrit un commentaire publié', () => {
+    expect(activityLabel({ type: 'COMMENTED', mediaType: 'MOVIE', detail: 'Top !' })).toBe('a commenté');
   });
 
   it("extrait le message d'un ProblemDetail", () => {

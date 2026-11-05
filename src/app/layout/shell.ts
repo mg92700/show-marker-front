@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { AuthService } from '../core/auth.service';
+import { SocialService } from '../core/social.service';
 
 @Component({
   selector: 'app-shell',
@@ -21,6 +22,13 @@ import { AuthService } from '../core/auth.service';
             >
               <span class="nav-icon" aria-hidden="true">{{ link.icon }}</span>
               <span class="nav-label">{{ link.label }}</span>
+              @if (link.path === '/friends' && social.pendingRequests() > 0) {
+                <span
+                  class="nav-badge"
+                  [attr.aria-label]="social.pendingRequests() + ' demande(s) en attente'"
+                  >{{ social.pendingRequests() }}</span
+                >
+              }
             </a>
           }
         </nav>
@@ -53,6 +61,7 @@ import { AuthService } from '../core/auth.service';
     .nav a:hover { color: var(--text); }
     .nav a.active { color: var(--text); background: var(--bg-elev-2); }
     .nav-icon { font-size: 1rem; }
+    .nav-badge { min-width: 18px; padding: 0 5px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 0.7rem; font-weight: 700; line-height: 18px; text-align: center; }
     .user { display: flex; align-items: center; gap: 8px; }
     .footer { max-width: 1200px; margin: 0 auto; padding: 0 16px 90px; text-align: center; }
     .footer a { text-decoration: underline; }
@@ -67,12 +76,19 @@ import { AuthService } from '../core/auth.service';
     }
   `,
 })
-export class Shell {
+export class Shell implements OnInit {
   protected readonly auth = inject(AuthService);
+  protected readonly social = inject(SocialService);
   protected readonly links = [
     { path: '/', label: 'Accueil', icon: '⌂' },
     { path: '/library', label: 'Bibliothèque', icon: '▦' },
     { path: '/search', label: 'Recherche', icon: '⌕' },
+    { path: '/friends', label: 'Amis', icon: '☺' },
     { path: '/profile', label: 'Profil', icon: '◉' },
   ];
+
+  /** Charge les abonnés pour afficher le nombre de demandes en attente (silencieux en cas d'erreur). */
+  ngOnInit(): void {
+    this.social.followers().subscribe({ error: () => undefined });
+  }
 }

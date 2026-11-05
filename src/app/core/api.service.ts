@@ -73,6 +73,11 @@ export class ApiService {
     return this.http.delete<void>(`${this.api}/library/${id}`);
   }
 
+  /** Publie un court commentaire sur un titre de la bibliothèque (visible par les abonnés). */
+  comment(id: number, text: string): Observable<void> {
+    return this.http.post<void>(`${this.api}/library/${id}/comments`, { text });
+  }
+
   setEpisodes(id: number, episodeIds: string[], watched: boolean): Observable<LibraryEntry> {
     return this.http.put<LibraryEntry>(`${this.api}/library/${id}/episodes`, { episodeIds, watched });
   }

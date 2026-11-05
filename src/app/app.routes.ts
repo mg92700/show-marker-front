@@ -49,6 +49,17 @@ export const routes: Routes = [
           import('./pages/movie-detail/movie-detail.page').then((m) => m.MovieDetailPage),
       },
       {
+        path: 'friends',
+        title: 'Amis · Show Marker',
+        loadComponent: () => import('./pages/social/social.page').then((m) => m.SocialPage),
+      },
+      {
+        path: 'users/:id',
+        title: 'Profil · Show Marker',
+        loadComponent: () =>
+          import('./pages/user-profile/user-profile.page').then((m) => m.UserProfilePage),
+      },
+      {
         path: 'profile',
         title: 'Profil · Show Marker',
         loadComponent: () => import('./pages/profile/profile.page').then((m) => m.ProfilePage),

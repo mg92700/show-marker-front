@@ -139,7 +139,14 @@ export interface RecentEpisode {
 
 export interface Activity {
   id: number;
-  type: 'ADDED' | 'REMOVED' | 'STATUS_CHANGED' | 'EPISODE_WATCHED' | 'EPISODES_WATCHED' | 'MOVIE_WATCHED';
+  type:
+    | 'ADDED'
+    | 'REMOVED'
+    | 'STATUS_CHANGED'
+    | 'EPISODE_WATCHED'
+    | 'EPISODES_WATCHED'
+    | 'MOVIE_WATCHED'
+    | 'COMMENTED';
   mediaType: MediaType;
   libraryItemId: number | null;
   title: string;
@@ -165,6 +172,48 @@ export interface Dashboard {
   recentMovies: LibraryItem[];
   recentActivity: Activity[];
   stats: DashboardStats;
+}
+
+export type FollowStatus = 'PENDING' | 'ACCEPTED';
+
+/** Autre utilisateur (seul le pseudo est exposé). `followStatus` : état du lien concerné par la liste. */
+export interface UserSummary {
+  id: number;
+  displayName: string;
+  followStatus: FollowStatus | null;
+}
+
+/** Profil public ; `activityVisible` est vrai pour soi-même et pour les abonnés acceptés. */
+export interface UserProfile {
+  id: number;
+  displayName: string;
+  followStatus: FollowStatus | null;
+  followersCount: number;
+  followingCount: number;
+  activityVisible: boolean;
+}
+
+export interface Reply {
+  id: number;
+  userId: number;
+  displayName: string;
+  text: string;
+  createdAt: string;
+}
+
+/** Activité du fil social ; `externalId` et `posterUrl` sont null si le titre a été retiré de la bibliothèque. */
+export interface FeedItem {
+  id: number;
+  userId: number;
+  displayName: string;
+  type: Activity['type'];
+  mediaType: MediaType;
+  externalId: string | null;
+  posterUrl: string | null;
+  title: string;
+  detail: string | null;
+  createdAt: string;
+  replies: Reply[];
 }
 
 /** Erreur au format ProblemDetail (RFC 9457) renvoyée par le backend. */

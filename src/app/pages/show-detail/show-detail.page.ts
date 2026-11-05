@@ -6,10 +6,11 @@ import { Observable, forkJoin, map, of, switchMap } from 'rxjs';
 import { ApiService, errorMessage } from '../../core/api.service';
 import { SHOW_STATUSES, episodeCode, statusLabel } from '../../core/labels';
 import { Episode, LibraryEntry, LibraryStatus, Season, ShowDetails } from '../../core/models';
+import { CommentBox } from '../../shared/comment-box';
 
 @Component({
   selector: 'app-show-detail-page',
-  imports: [DatePipe],
+  imports: [DatePipe, CommentBox],
   templateUrl: './show-detail.page.html',
   styleUrl: './show-detail.page.css',
 })

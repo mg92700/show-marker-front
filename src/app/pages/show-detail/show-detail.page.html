@@ -81,6 +81,11 @@
               }
             </div>
           }
+          @if (progress(); as p) {
+            @if (p.watched > 0) {
+              <app-comment-box [itemId]="it.id" />
+            }
+          }
         } @else {
           <div class="row">
             <button class="btn btn-primary" type="button" [disabled]="busy()" (click)="add('WATCHLIST')">

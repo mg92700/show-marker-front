@@ -2,12 +2,15 @@ import {
   Activity,
   Dashboard,
   Episode,
+  FeedItem,
   LibraryItem,
   MediaSummary,
   MovieDetails,
   RecentEpisode,
   ShowDetails,
   User,
+  UserProfile,
+  UserSummary,
 } from '../core/models';
 
 export const makeUser = (o: Partial<User> = {}): User => ({
@@ -158,5 +161,37 @@ export const makeDashboard = (o: Partial<Dashboard> = {}): Dashboard => ({
     episodesWatched: 40,
     globalProgress: 55,
   },
+  ...o,
+});
+
+export const makeUserSummary = (o: Partial<UserSummary> = {}): UserSummary => ({
+  id: 2,
+  displayName: 'Bob',
+  followStatus: null,
+  ...o,
+});
+
+export const makeFeedItem = (o: Partial<FeedItem> = {}): FeedItem => ({
+  id: 30,
+  userId: 2,
+  displayName: 'Bob',
+  type: 'MOVIE_WATCHED',
+  mediaType: 'MOVIE',
+  externalId: '603',
+  posterUrl: 'https://img/matrix.jpg',
+  title: 'The Matrix',
+  detail: null,
+  createdAt: '2026-01-03T10:00:00Z',
+  replies: [],
+  ...o,
+});
+
+export const makeProfile = (o: Partial<UserProfile> = {}): UserProfile => ({
+  id: 2,
+  displayName: 'Bob',
+  followStatus: null,
+  followersCount: 3,
+  followingCount: 4,
+  activityVisible: false,
   ...o,
 });

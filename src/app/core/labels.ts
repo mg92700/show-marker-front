@@ -22,7 +22,7 @@ export function episodeCode(e: Pick<Episode, 'season' | 'number'>): string {
   return `S${String(e.season).padStart(2, '0')}E${String(e.number).padStart(2, '0')}`;
 }
 
-export function activityLabel(a: Activity): string {
+export function activityLabel(a: Pick<Activity, 'type' | 'mediaType' | 'detail'>): string {
   switch (a.type) {
     case 'ADDED':
       return a.mediaType === 'SHOW' ? 'a ajouté la série' : 'a ajouté le film';
@@ -36,6 +36,8 @@ export function activityLabel(a: Activity): string {
       return `a vu ${a.detail ?? 'des épisodes'} de`;
     case 'MOVIE_WATCHED':
       return 'a vu le film';
+    case 'COMMENTED':
+      return 'a commenté';
   }
 }
 

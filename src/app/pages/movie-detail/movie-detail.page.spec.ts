@@ -82,11 +82,14 @@ describe('MovieDetailPage', () => {
     const entry: LibraryEntry = { item: makeMovieItem(), watchedEpisodeIds: [] };
     const { fixture, stub } = setup({ entry: vi.fn().mockReturnValueOnce(of(empty)).mockReturnValue(of(entry)) });
     const el = await render(fixture);
+    expect(el.querySelector('app-comment-box')).toBeNull();
     click(el, '.row .btn-primary');
     await fixture.whenStable();
     expect(stub.add).toHaveBeenCalledWith('MOVIE', '603', 'WATCHLIST');
     expect(text(el)).toContain('À regarder');
     expect(text(el)).toContain('Marquer comme vu');
+    // Le film n'est pas encore vu : pas de commentaire possible.
+    expect(el.querySelector('app-comment-box')).toBeNull();
   });
 
   it('ajoute le film directement comme « déjà vu »', async () => {
@@ -97,6 +100,8 @@ describe('MovieDetailPage', () => {
     await fixture.whenStable();
     expect(stub.add).toHaveBeenCalledWith('MOVIE', '603', 'WATCHED');
     expect(text(el)).toContain('Remettre à regarder');
+    // Un film vu peut être commenté.
+    expect(el.querySelector('app-comment-box')).not.toBeNull();
   });
 
   it('marque comme vu puis remet à regarder', async () => {

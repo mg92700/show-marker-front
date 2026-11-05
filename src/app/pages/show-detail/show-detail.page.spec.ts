@@ -4,6 +4,7 @@ import { of } from 'rxjs';
 
 import { ApiService } from '../../core/api.service';
 import { LibraryEntry, ShowDetails } from '../../core/models';
+import { makeItem } from '../../testing/fixtures';
 import { ShowDetailPage } from './show-detail.page';
 
 const show: ShowDetails = {
@@ -60,4 +61,22 @@ describe('ShowDetailPage', () => {
     expect(api.setEpisodes).toHaveBeenCalledWith(5, ['11'], true);
     expect(el.querySelector('.episode.watched')).not.toBeNull();
   }, 10_000);
+
+  it('ne propose de commenter qu’une série dont au moins un épisode est vu', async () => {
+    const render = async (watched: number) => {
+      TestBed.resetTestingModule();
+      const item = makeItem({ progress: { watched, total: 4, percent: 0, nextEpisode: null } });
+      const api = { show: vi.fn(() => of(show)), entry: vi.fn(() => of({ item, watchedEpisodeIds: [] })) };
+      TestBed.configureTestingModule({
+        imports: [ShowDetailPage],
+        providers: [provideRouter([]), { provide: ApiService, useValue: api }],
+      });
+      const fixture = TestBed.createComponent(ShowDetailPage);
+      fixture.componentRef.setInput('id', '1');
+      await fixture.whenStable();
+      return fixture.nativeElement as HTMLElement;
+    };
+    expect((await render(0)).querySelector('app-comment-box')).toBeNull();
+    expect((await render(1)).querySelector('app-comment-box')).not.toBeNull();
+  });
 });
