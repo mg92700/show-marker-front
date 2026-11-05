@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, catchError, firstValueFrom, of, tap } from 'rxjs';
 
 import { environment } from '../../environments/environment';
-import { AuthResponse, MessageResponse, User } from './models';
+import { AuthResponse, User } from './models';
 
 /**
  * Session utilisateur. Le JWT est stocké par le navigateur dans un cookie HttpOnly posé par le backend :
@@ -42,26 +42,11 @@ export class AuthService {
       .pipe(tap((res) => this.start(res)));
   }
 
-  /** Crée le compte : aucune session n'est ouverte, l'utilisateur doit d'abord confirmer son adresse e-mail. */
-  register(email: string, password: string, displayName: string): Observable<MessageResponse> {
-    return this.http.post<MessageResponse>(`${this.api}/register`, { email, password, displayName });
-  }
-
-  /** Confirme une adresse (création de compte ou changement d'adresse) avec le jeton reçu par e-mail. */
-  verifyEmail(token: string): Observable<void> {
-    return this.http.post<void>(`${this.api}/verify-email`, { token });
-  }
-
-  resendVerification(email: string): Observable<MessageResponse> {
-    return this.http.post<MessageResponse>(`${this.api}/resend-verification`, { email });
-  }
-
-  forgotPassword(email: string): Observable<MessageResponse> {
-    return this.http.post<MessageResponse>(`${this.api}/forgot-password`, { email });
-  }
-
-  resetPassword(token: string, newPassword: string): Observable<void> {
-    return this.http.post<void>(`${this.api}/reset-password`, { token, newPassword });
+  /** Crée le compte (pseudo et email uniques) : la session est ouverte immédiatement. */
+  register(email: string, password: string, displayName: string): Observable<AuthResponse> {
+    return this.http
+      .post<AuthResponse>(`${this.api}/register`, { email, password, displayName })
+      .pipe(tap((res) => this.start(res)));
   }
 
   /** Met à jour l'utilisateur affiché (après une modification de profil) sans toucher à la durée de session. */

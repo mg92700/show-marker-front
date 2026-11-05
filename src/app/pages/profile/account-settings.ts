@@ -10,7 +10,7 @@ interface Feedback {
   text: string;
 }
 
-/** Modification du pseudo, de l'adresse e-mail et du mot de passe depuis le profil. */
+/** Modification du pseudo et du mot de passe depuis le profil. */
 @Component({
   selector: 'app-account-settings',
   imports: [ReactiveFormsModule],
@@ -29,32 +29,6 @@ interface Feedback {
           <div class="alert" [class.alert-success]="f.kind === 'success'" [class.alert-error]="f.kind === 'error'" role="status">{{ f.text }}</div>
         }
         <button class="btn btn-primary" type="submit" [disabled]="nameBusy() || !nameChanged()">Enregistrer le pseudo</button>
-      </form>
-
-      <form class="card stack" [formGroup]="emailForm" (ngSubmit)="saveEmail()" novalidate>
-        <h3>Adresse e-mail</h3>
-        <p class="muted small">
-          Un lien de confirmation sera envoyé à la nouvelle adresse. Votre adresse actuelle reste active tant que vous
-          ne l'avez pas confirmée.
-        </p>
-        <div class="field">
-          <label for="set-email">Nouvelle adresse e-mail</label>
-          <input id="set-email" class="input" type="email" formControlName="newEmail" autocomplete="email" />
-          @if (emailForm.controls.newEmail.touched && emailForm.controls.newEmail.invalid) {
-            <span class="field-error">Email invalide.</span>
-          }
-        </div>
-        <div class="field">
-          <label for="set-email-password">Mot de passe actuel</label>
-          <input id="set-email-password" class="input" type="password" formControlName="currentPassword" autocomplete="current-password" />
-          @if (emailForm.controls.currentPassword.touched && emailForm.controls.currentPassword.invalid) {
-            <span class="field-error">Mot de passe obligatoire.</span>
-          }
-        </div>
-        @if (emailFeedback(); as f) {
-          <div class="alert" [class.alert-success]="f.kind === 'success'" [class.alert-error]="f.kind === 'error'" role="status">{{ f.text }}</div>
-        }
-        <button class="btn btn-primary" type="submit" [disabled]="emailBusy()">Changer l'adresse e-mail</button>
       </form>
 
       <form class="card stack" [formGroup]="passwordForm" (ngSubmit)="savePassword()" novalidate>
@@ -101,10 +75,6 @@ export class AccountSettings {
   protected readonly nameForm = this.fb.group({
     displayName: [this.auth.user()?.displayName ?? '', [Validators.required, Validators.maxLength(50)]],
   });
-  protected readonly emailForm = this.fb.group({
-    newEmail: ['', [Validators.required, Validators.email]],
-    currentPassword: ['', Validators.required],
-  });
   protected readonly passwordForm = this.fb.group({
     currentPassword: ['', Validators.required],
     newPassword: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]],
@@ -112,10 +82,8 @@ export class AccountSettings {
   });
 
   protected readonly nameBusy = signal(false);
-  protected readonly emailBusy = signal(false);
   protected readonly passwordBusy = signal(false);
   protected readonly nameFeedback = signal<Feedback | null>(null);
-  protected readonly emailFeedback = signal<Feedback | null>(null);
   protected readonly passwordFeedback = signal<Feedback | null>(null);
 
   protected nameChanged(): boolean {
@@ -142,25 +110,6 @@ export class AccountSettings {
       error: (err) => {
         this.nameBusy.set(false);
         this.nameFeedback.set({ kind: 'error', text: errorMessage(err, 'Impossible de modifier le pseudo.') });
-      },
-    });
-  }
-
-  protected saveEmail(): void {
-    this.emailForm.markAllAsTouched();
-    if (this.emailForm.invalid) return;
-    this.emailBusy.set(true);
-    this.emailFeedback.set(null);
-    const { newEmail, currentPassword } = this.emailForm.getRawValue();
-    this.account.changeEmail(newEmail.trim(), currentPassword).subscribe({
-      next: (res) => {
-        this.emailBusy.set(false);
-        this.emailForm.reset();
-        this.emailFeedback.set({ kind: 'success', text: res.message });
-      },
-      error: (err) => {
-        this.emailBusy.set(false);
-        this.emailFeedback.set({ kind: 'error', text: errorMessage(err, "Impossible de changer l'adresse e-mail.") });
       },
     });
   }

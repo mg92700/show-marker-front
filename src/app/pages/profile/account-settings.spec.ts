@@ -12,7 +12,6 @@ describe('AccountSettings', () => {
   const setup = (account: Record<string, unknown> = {}, user: ReturnType<typeof makeUser> | null = makeUser({ displayName: 'Mouhsin' })) => {
     const stub = {
       updateDisplayName: vi.fn((name: string) => of(makeUser({ displayName: name }))),
-      changeEmail: vi.fn(() => of({ message: 'Lien envoyé.' })),
       changePassword: vi.fn(() => of(undefined)),
       ...account,
     };
@@ -90,51 +89,6 @@ describe('AccountSettings', () => {
     });
   });
 
-  describe('e-mail', () => {
-    it('envoie la demande de changement et vide le formulaire', async () => {
-      const { fixture, stub } = setup();
-      const el = await render(fixture);
-      type(el, '#set-email', ' new@example.com ');
-      type(el, '#set-email-password', 'secret123');
-      submit(el, form(el, 2));
-      await fixture.whenStable();
-      expect(stub.changeEmail).toHaveBeenCalledWith('new@example.com', 'secret123');
-      expect(text(el)).toContain('Lien envoyé.');
-      expect((el.querySelector('#set-email') as HTMLInputElement).value).toBe('');
-    });
-
-    it('valide les champs avant l’envoi', async () => {
-      const { fixture, stub } = setup();
-      const el = await render(fixture);
-      type(el, '#set-email', 'pas-un-mail');
-      submit(el, form(el, 2));
-      await fixture.whenStable();
-      expect(stub.changeEmail).not.toHaveBeenCalled();
-      expect(text(el)).toContain('Email invalide.');
-      expect(text(el)).toContain('Mot de passe obligatoire.');
-    });
-
-    it('affiche l’erreur serveur', async () => {
-      const { fixture } = setup({ changeEmail: vi.fn(() => throwError(() => httpError(400, { detail: 'Mot de passe incorrect.' }))) });
-      const el = await render(fixture);
-      type(el, '#set-email', 'new@example.com');
-      type(el, '#set-email-password', 'mauvais');
-      submit(el, form(el, 2));
-      await fixture.whenStable();
-      expect(text(el)).toContain('Mot de passe incorrect.');
-    });
-
-    it('utilise un message par défaut si le serveur n’en donne pas', async () => {
-      const { fixture } = setup({ changeEmail: vi.fn(() => throwError(() => httpError(500))) });
-      const el = await render(fixture);
-      type(el, '#set-email', 'new@example.com');
-      type(el, '#set-email-password', 'x');
-      submit(el, form(el, 2));
-      await fixture.whenStable();
-      expect(text(el)).toContain("Impossible de changer l'adresse e-mail.");
-    });
-  });
-
   describe('mot de passe', () => {
     const fill = (el: HTMLElement, current: string, next: string, confirm: string) => {
       type(el, '#set-current', current);
@@ -146,7 +100,7 @@ describe('AccountSettings', () => {
       const { fixture, stub } = setup();
       const el = await render(fixture);
       fill(el, 'ancien123', 'nouveau123', 'nouveau123');
-      submit(el, form(el, 3));
+      submit(el, form(el, 2));
       await fixture.whenStable();
       expect(stub.changePassword).toHaveBeenCalledWith('ancien123', 'nouveau123');
       expect(text(el)).toContain('Mot de passe modifié.');
@@ -157,7 +111,7 @@ describe('AccountSettings', () => {
       const { fixture, stub } = setup();
       const el = await render(fixture);
       fill(el, 'ancien123', 'court', 'court');
-      submit(el, form(el, 3));
+      submit(el, form(el, 2));
       await fixture.whenStable();
       expect(stub.changePassword).not.toHaveBeenCalled();
       expect(text(el)).toContain('8 caractères minimum.');
@@ -167,7 +121,7 @@ describe('AccountSettings', () => {
       const { fixture, stub } = setup();
       const el = await render(fixture);
       fill(el, 'ancien123', 'nouveau123', 'autre12345');
-      submit(el, form(el, 3));
+      submit(el, form(el, 2));
       await fixture.whenStable();
       expect(stub.changePassword).not.toHaveBeenCalled();
       expect(text(el)).toContain('Les mots de passe ne correspondent pas.');
@@ -177,7 +131,7 @@ describe('AccountSettings', () => {
       const { fixture } = setup({ changePassword: vi.fn(() => throwError(() => httpError(400, { detail: 'Ancien mot de passe incorrect.' }))) });
       const el = await render(fixture);
       fill(el, 'faux12345', 'nouveau123', 'nouveau123');
-      submit(el, form(el, 3));
+      submit(el, form(el, 2));
       await fixture.whenStable();
       expect(text(el)).toContain('Ancien mot de passe incorrect.');
     });
@@ -186,7 +140,7 @@ describe('AccountSettings', () => {
       const { fixture } = setup({ changePassword: vi.fn(() => throwError(() => httpError(500))) });
       const el = await render(fixture);
       fill(el, 'ancien123', 'nouveau123', 'nouveau123');
-      submit(el, form(el, 3));
+      submit(el, form(el, 2));
       await fixture.whenStable();
       expect(text(el)).toContain('Impossible de modifier le mot de passe.');
     });

@@ -11,11 +11,6 @@ export interface User {
   createdAt: string;
 }
 
-/** Réponse générique du backend (ne révèle jamais si une adresse existe). */
-export interface MessageResponse {
-  message: string;
-}
-
 export interface AuthResponse {
   user: User;
   expiresAt: string;
@@ -164,8 +159,6 @@ export interface ProblemDetail {
   status: number;
   title?: string;
   detail?: string;
-  /** Code machine optionnel, ex. EMAIL_NOT_VERIFIED. */
-  code?: string;
   errors?: Record<string, string>;
 }
 
