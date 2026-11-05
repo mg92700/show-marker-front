@@ -6,11 +6,13 @@ import { errorMessage } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { safeReturnUrl } from '../../core/return-url';
 import { GoogleButton } from '../../shared/google-button';
+import { PosterWall } from '../../shared/poster-wall';
 
 @Component({
   selector: 'app-login-page',
-  imports: [ReactiveFormsModule, RouterLink, GoogleButton],
+  imports: [ReactiveFormsModule, RouterLink, GoogleButton, PosterWall],
   template: `
+    <app-poster-wall />
     <div class="card auth-card">
       <div class="brand"><img class="brand-mark" src="logo.svg" alt="" width="34" height="34"> Show Marker</div>
       <div>

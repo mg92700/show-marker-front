@@ -21,6 +21,13 @@ describe('ApiService', () => {
     expect(http.expectOne('/api/catalog/status').request.method).toBe('GET');
   });
 
+  it('charge les affiches de titres cultes', () => {
+    let result: unknown;
+    api.showcase().subscribe((items) => (result = items));
+    http.expectOne('/api/catalog/showcase').flush([{ title: 'Dark', posterUrl: 'https://img/dark.jpg' }]);
+    expect(result).toEqual([{ title: 'Dark', posterUrl: 'https://img/dark.jpg' }]);
+  });
+
   it('recherche des séries et des films avec le terme en paramètre', () => {
     api.searchShows('dark').subscribe();
     const shows = http.expectOne((r) => r.url === '/api/catalog/shows');

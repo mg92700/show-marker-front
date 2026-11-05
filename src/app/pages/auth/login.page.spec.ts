@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
+import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { httpError, render, submit, text, type } from '../../testing/helpers';
 import { LoginPage } from './login.page';
@@ -11,7 +12,7 @@ describe('LoginPage', () => {
     const stub = { login: vi.fn(() => of({})), providers: vi.fn(() => of({ googleClientId: null })), ...auth };
     TestBed.configureTestingModule({
       imports: [LoginPage],
-      providers: [provideRouter([]), { provide: AuthService, useValue: stub }],
+      providers: [provideRouter([]), { provide: AuthService, useValue: stub }, { provide: ApiService, useValue: { showcase: () => of([]) } }],
     });
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
     const fixture = TestBed.createComponent(LoginPage);

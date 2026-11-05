@@ -5,11 +5,13 @@ import { Router, RouterLink } from '@angular/router';
 import { errorMessage } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { GoogleButton } from '../../shared/google-button';
+import { PosterWall } from '../../shared/poster-wall';
 
 @Component({
   selector: 'app-register-page',
-  imports: [ReactiveFormsModule, RouterLink, GoogleButton],
+  imports: [ReactiveFormsModule, RouterLink, GoogleButton, PosterWall],
   template: `
+    <app-poster-wall />
     <div class="card auth-card">
       <div class="brand"><img class="brand-mark" src="logo.svg" alt="" width="34" height="34"> Show Marker</div>
       <div>

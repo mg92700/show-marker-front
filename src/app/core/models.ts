@@ -86,6 +86,12 @@ export interface MovieDetails {
   rating: number | null;
 }
 
+/** Affiche d'un titre culte, utilisée pour habiller les pages publiques. */
+export interface ShowcaseItem {
+  title: string;
+  posterUrl: string;
+}
+
 export interface CatalogStatus {
   showProvider: string;
   movieProvider: string;

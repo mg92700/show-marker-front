@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
+import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { httpError, render, submit, text, type } from '../../testing/helpers';
 import { RegisterPage } from './register.page';
@@ -9,7 +10,7 @@ import { RegisterPage } from './register.page';
 describe('RegisterPage', () => {
   const setup = (auth: Record<string, unknown> = {}) => {
     const stub = { register: vi.fn(() => of({})), providers: vi.fn(() => of({ googleClientId: null })), ...auth };
-    TestBed.configureTestingModule({ imports: [RegisterPage], providers: [provideRouter([]), { provide: AuthService, useValue: stub }] });
+    TestBed.configureTestingModule({ imports: [RegisterPage], providers: [provideRouter([]), { provide: AuthService, useValue: stub }, { provide: ApiService, useValue: { showcase: () => of([]) } }] });
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
     return { fixture: TestBed.createComponent(RegisterPage), stub, navigate };
   };
