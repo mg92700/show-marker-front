@@ -83,6 +83,7 @@ p { margin: 0; }
 
 .alert { padding: 12px 14px; border-radius: var(--radius-sm); font-size: 0.9rem; border: 1px solid; }
 .alert-error { background: rgba(239, 93, 93, 0.1); border-color: rgba(239, 93, 93, 0.4); color: #ffb3b3; }
+.alert-success { background: rgba(47, 191, 113, 0.1); border-color: rgba(47, 191, 113, 0.4); color: #a8f0c7; }
 .alert-info { background: var(--accent-soft); border-color: rgba(124, 92, 255, 0.4); color: #d6cdff; }
 
 /* --- Cartes */

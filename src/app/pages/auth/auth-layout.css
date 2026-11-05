@@ -5,3 +5,4 @@
 form { display: flex; flex-direction: column; gap: 14px; }
 .switch { text-align: center; font-size: 0.9rem; color: var(--text-muted); }
 .switch a { color: var(--accent); font-weight: 600; }
+.forgot { align-self: flex-end; margin-top: -6px; font-size: 0.85rem; color: var(--accent); font-weight: 600; }

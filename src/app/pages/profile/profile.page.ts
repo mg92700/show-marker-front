@@ -6,10 +6,11 @@ import { AuthService } from '../../core/auth.service';
 import { DashboardStats, LibraryItem } from '../../core/models';
 import { detailLink } from '../../core/labels';
 import { PosterCard } from '../../shared/poster-card';
+import { AccountSettings } from './account-settings';
 
 @Component({
   selector: 'app-profile-page',
-  imports: [DatePipe, PosterCard],
+  imports: [DatePipe, PosterCard, AccountSettings],
   template: `
     <h1 class="page-title">Mon profil</h1>
 
@@ -24,6 +25,11 @@ import { PosterCard } from '../../shared/poster-card';
         <button class="btn btn-danger" type="button" (click)="auth.logout()">Se déconnecter</button>
       </div>
     }
+
+    <section class="section">
+      <div class="section-head"><h2>Mon compte</h2></div>
+      <app-account-settings />
+    </section>
 
     @if (stats(); as s) {
       <div class="stats section">

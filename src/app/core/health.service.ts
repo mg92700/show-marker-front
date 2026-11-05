@@ -19,7 +19,7 @@ const POLL_INTERVAL_MS = 30_000;
 /** Un backend gratuit en veille met longtemps à répondre : on le considère injoignable au-delà. */
 const REQUEST_TIMEOUT_MS = 8_000;
 
-/** Surveille le web service (API backend) et la base de données via GET /api/health. */
+/** Surveille le web service (API backend), la base de données et les API externes via GET /api/health. */
 @Injectable({ providedIn: 'root' })
 export class HealthService {
   private readonly http = inject(HttpClient);
@@ -41,6 +41,16 @@ export class HealthService {
     if (!report) return 'unknown';
     return report.database.status === 'UP' ? 'up' : 'down';
   });
+
+  /** API externes du catalogue (TVmaze, TMDB) : inconnues tant que le web service ne répond pas. */
+  readonly externalApis = computed<SignalState>(() => {
+    const apis = this.snapshot()?.report?.apis;
+    if (!apis) return 'unknown';
+    return apis.status === 'UP' ? 'up' : 'down';
+  });
+
+  /** Détail par fournisseur, pour l'infobulle. */
+  readonly apiProviders = computed(() => this.snapshot()?.report?.apis?.providers ?? {});
 
   /** Interroge l'API une fois ; une erreur réseau ou un dépassement de délai donne un rapport nul (API injoignable). */
   check(): Observable<HealthSnapshot> {

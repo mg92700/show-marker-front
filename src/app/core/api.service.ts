@@ -92,3 +92,8 @@ export function errorMessage(error: unknown, fallback = 'Une erreur est survenue
   }
   return fallback;
 }
+
+/** Code machine d'une erreur du backend (ex. EMAIL_NOT_VERIFIED), s'il y en a un. */
+export function errorCode(error: unknown): string | undefined {
+  return error instanceof HttpErrorResponse ? (error.error as ProblemDetail | null)?.code : undefined;
+}

@@ -8,13 +8,16 @@ interface Signal {
   state: SignalState;
 }
 
+const PROVIDER_LABELS: Record<string, string> = { tvmaze: 'TVmaze', tmdb: 'TMDB' };
+const PROVIDER_STATE_TEXT: Record<string, string> = { UP: 'en ligne', DOWN: 'indisponible', DISABLED: 'non configuré' };
+
 const STATE_TEXT: Record<SignalState, string> = {
   up: 'en ligne',
   down: 'indisponible',
   unknown: 'état inconnu',
 };
 
-/** Deux pastilles en bas à droite : la base de données et le web service, chacune verte (en ligne) ou rouge (en panne). */
+/** Trois pastilles en bas à droite (base de données, web service, API externes), chacune verte (en ligne) ou rouge (en panne). */
 @Component({
   selector: 'app-health-indicator',
   template: `
@@ -47,10 +50,17 @@ const STATE_TEXT: Record<SignalState, string> = {
 export class HealthIndicator {
   private readonly health = inject(HealthService);
 
-  protected readonly signals = computed<Signal[]>(() => [
-    { label: 'BDD', title: `Base de données : ${STATE_TEXT[this.health.database()]}`, state: this.health.database() },
-    { label: 'Web', title: `Web service : ${STATE_TEXT[this.health.webService()]}`, state: this.health.webService() },
-  ]);
+  protected readonly signals = computed<Signal[]>(() => {
+    const providers = Object.entries(this.health.apiProviders())
+      .map(([name, state]) => `${PROVIDER_LABELS[name] ?? name} ${PROVIDER_STATE_TEXT[state] ?? state}`)
+      .join(', ');
+    const apis = this.health.externalApis();
+    return [
+      { label: 'BDD', title: `Base de données : ${STATE_TEXT[this.health.database()]}`, state: this.health.database() },
+      { label: 'Web', title: `Web service : ${STATE_TEXT[this.health.webService()]}`, state: this.health.webService() },
+      { label: 'API', title: `API externes : ${STATE_TEXT[apis]}${providers ? ` (${providers})` : ''}`, state: apis },
+    ];
+  });
 
   constructor() {
     this.health.start();
