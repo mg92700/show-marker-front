@@ -89,6 +89,16 @@ describe('AccountSettings', () => {
     });
   });
 
+  describe('compte Google', () => {
+    it('remplace le formulaire de mot de passe par une explication', async () => {
+      const { fixture } = setup({}, makeUser({ hasPassword: false }));
+      const el = await render(fixture);
+      expect(el.querySelectorAll('form').length).toBe(1);
+      expect(text(el)).toContain('se connecte avec Google');
+      expect(el.querySelector('#set-new')).toBeNull();
+    });
+  });
+
   describe('mot de passe', () => {
     const fill = (el: HTMLElement, current: string, next: string, confirm: string) => {
       type(el, '#set-current', current);

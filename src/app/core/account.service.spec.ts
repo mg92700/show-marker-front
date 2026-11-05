@@ -8,7 +8,7 @@ import { authInterceptor } from './auth.interceptor';
 import { AuthService } from './auth.service';
 import { AuthResponse, User } from './models';
 
-const alice: User = { id: 1, email: 'a@b.c', displayName: 'Alice', role: 'USER', createdAt: '2026-01-01T00:00:00Z' };
+const alice: User = { id: 1, email: 'a@b.c', displayName: 'Alice', role: 'USER', createdAt: '2026-01-01T00:00:00Z', hasPassword: true };
 
 describe('Compte : inscription, vérification, mot de passe, profil', () => {
   let auth: AuthService;

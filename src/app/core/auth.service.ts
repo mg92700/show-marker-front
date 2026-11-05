@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, catchError, firstValueFrom, of, tap } from 'rxjs';
 
 import { environment } from '../../environments/environment';
-import { AuthResponse, User } from './models';
+import { AuthProviders, AuthResponse, User } from './models';
 
 /**
  * Session utilisateur. Le JWT est stocké par le navigateur dans un cookie HttpOnly posé par le backend :
@@ -40,6 +40,18 @@ export class AuthService {
     return this.http
       .post<AuthResponse>(`${this.api}/login`, { email, password })
       .pipe(tap((res) => this.start(res)));
+  }
+
+  /** Connexion avec le jeton d'identité remis par Google Identity Services (crée ou rattache le compte). */
+  loginWithGoogle(credential: string): Observable<AuthResponse> {
+    return this.http
+      .post<AuthResponse>(`${this.api}/google`, { credential })
+      .pipe(tap((res) => this.start(res)));
+  }
+
+  /** Fournisseurs de connexion disponibles (permet de n'afficher le bouton Google que s'il est configuré). */
+  providers(): Observable<AuthProviders> {
+    return this.http.get<AuthProviders>(`${this.api}/providers`);
   }
 
   /** Crée le compte (pseudo et email uniques) : la session est ouverte immédiatement. */

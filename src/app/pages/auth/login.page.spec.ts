@@ -8,7 +8,7 @@ import { LoginPage } from './login.page';
 
 describe('LoginPage', () => {
   const setup = (auth: Record<string, unknown> = {}, inputs: Record<string, string> = {}) => {
-    const stub = { login: vi.fn(() => of({})), ...auth };
+    const stub = { login: vi.fn(() => of({})), providers: vi.fn(() => of({ googleClientId: null })), ...auth };
     TestBed.configureTestingModule({
       imports: [LoginPage],
       providers: [provideRouter([]), { provide: AuthService, useValue: stub }],

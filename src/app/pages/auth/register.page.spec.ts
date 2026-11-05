@@ -8,7 +8,7 @@ import { RegisterPage } from './register.page';
 
 describe('RegisterPage', () => {
   const setup = (auth: Record<string, unknown> = {}) => {
-    const stub = { register: vi.fn(() => of({})), ...auth };
+    const stub = { register: vi.fn(() => of({})), providers: vi.fn(() => of({ googleClientId: null })), ...auth };
     TestBed.configureTestingModule({ imports: [RegisterPage], providers: [provideRouter([]), { provide: AuthService, useValue: stub }] });
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
     return { fixture: TestBed.createComponent(RegisterPage), stub, navigate };

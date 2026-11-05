@@ -9,6 +9,13 @@ export interface User {
   displayName: string;
   role: string;
   createdAt: string;
+  /** Faux pour un compte créé via Google (aucun mot de passe à gérer). */
+  hasPassword: boolean;
+}
+
+/** Fournisseurs de connexion externes ; `googleClientId` est null si Google n'est pas configuré côté backend. */
+export interface AuthProviders {
+  googleClientId: string | null;
 }
 
 export interface AuthResponse {

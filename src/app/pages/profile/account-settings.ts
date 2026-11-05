@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AccountService } from '../../core/account.service';
@@ -31,34 +31,41 @@ interface Feedback {
         <button class="btn btn-primary" type="submit" [disabled]="nameBusy() || !nameChanged()">Enregistrer le pseudo</button>
       </form>
 
-      <form class="card stack" [formGroup]="passwordForm" (ngSubmit)="savePassword()" novalidate>
-        <h3>Mot de passe</h3>
-        <div class="field">
-          <label for="set-current">Mot de passe actuel</label>
-          <input id="set-current" class="input" type="password" formControlName="currentPassword" autocomplete="current-password" />
-          @if (passwordForm.controls.currentPassword.touched && passwordForm.controls.currentPassword.invalid) {
-            <span class="field-error">Mot de passe obligatoire.</span>
+      @if (hasPassword()) {
+        <form class="card stack" [formGroup]="passwordForm" (ngSubmit)="savePassword()" novalidate>
+          <h3>Mot de passe</h3>
+          <div class="field">
+            <label for="set-current">Mot de passe actuel</label>
+            <input id="set-current" class="input" type="password" formControlName="currentPassword" autocomplete="current-password" />
+            @if (passwordForm.controls.currentPassword.touched && passwordForm.controls.currentPassword.invalid) {
+              <span class="field-error">Mot de passe obligatoire.</span>
+            }
+          </div>
+          <div class="field">
+            <label for="set-new">Nouveau mot de passe</label>
+            <input id="set-new" class="input" type="password" formControlName="newPassword" autocomplete="new-password" />
+            @if (passwordForm.controls.newPassword.touched && passwordForm.controls.newPassword.invalid) {
+              <span class="field-error">8 caractères minimum.</span>
+            }
+          </div>
+          <div class="field">
+            <label for="set-confirm">Confirmation du nouveau mot de passe</label>
+            <input id="set-confirm" class="input" type="password" formControlName="confirm" autocomplete="new-password" />
+            @if (passwordForm.controls.confirm.touched && mismatch()) {
+              <span class="field-error">Les mots de passe ne correspondent pas.</span>
+            }
+          </div>
+          @if (passwordFeedback(); as f) {
+            <div class="alert" [class.alert-success]="f.kind === 'success'" [class.alert-error]="f.kind === 'error'" role="status">{{ f.text }}</div>
           }
+          <button class="btn btn-primary" type="submit" [disabled]="passwordBusy()">Changer le mot de passe</button>
+        </form>
+      } @else {
+        <div class="card stack">
+          <h3>Mot de passe</h3>
+          <p class="muted small">Ce compte se connecte avec Google : il n'y a pas de mot de passe à gérer.</p>
         </div>
-        <div class="field">
-          <label for="set-new">Nouveau mot de passe</label>
-          <input id="set-new" class="input" type="password" formControlName="newPassword" autocomplete="new-password" />
-          @if (passwordForm.controls.newPassword.touched && passwordForm.controls.newPassword.invalid) {
-            <span class="field-error">8 caractères minimum.</span>
-          }
-        </div>
-        <div class="field">
-          <label for="set-confirm">Confirmation du nouveau mot de passe</label>
-          <input id="set-confirm" class="input" type="password" formControlName="confirm" autocomplete="new-password" />
-          @if (passwordForm.controls.confirm.touched && mismatch()) {
-            <span class="field-error">Les mots de passe ne correspondent pas.</span>
-          }
-        </div>
-        @if (passwordFeedback(); as f) {
-          <div class="alert" [class.alert-success]="f.kind === 'success'" [class.alert-error]="f.kind === 'error'" role="status">{{ f.text }}</div>
-        }
-        <button class="btn btn-primary" type="submit" [disabled]="passwordBusy()">Changer le mot de passe</button>
-      </form>
+      }
     </div>
   `,
   styles: `
@@ -80,6 +87,9 @@ export class AccountSettings {
     newPassword: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]],
     confirm: ['', Validators.required],
   });
+
+  /** Faux pour un compte créé via Google. */
+  protected readonly hasPassword = computed(() => this.auth.user()?.hasPassword ?? true);
 
   protected readonly nameBusy = signal(false);
   protected readonly passwordBusy = signal(false);

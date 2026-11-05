@@ -4,10 +4,11 @@ import { Router, RouterLink } from '@angular/router';
 
 import { errorMessage } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
+import { GoogleButton } from '../../shared/google-button';
 
 @Component({
   selector: 'app-register-page',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, GoogleButton],
   template: `
     <div class="card auth-card">
       <div class="brand"><img class="brand-mark" src="logo.svg" alt="" width="34" height="34"> Show Marker</div>
@@ -65,6 +66,8 @@ import { AuthService } from '../../core/auth.service';
           {{ loading() ? 'Création…' : 'Créer mon compte' }}
         </button>
       </form>
+
+      <app-google-button />
 
       <p class="switch">Déjà inscrit ? <a routerLink="/login">Se connecter</a></p>
     </div>

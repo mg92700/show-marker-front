@@ -90,3 +90,9 @@ git push origin main
 ```
 
 Convention : `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`, `test:`.
+
+
+## Connexion avec Google
+
+Le bouton « Continuer avec Google » (pages de connexion et d'inscription) n'apparaît que si le backend a un `GOOGLE_CLIENT_ID` configuré : le front lit `GET /api/auth/providers`. Aucune configuration côté front.
+Dans Google Cloud Console, l'URL du front (`http://localhost:4200` en local, l'URL publique en production) doit figurer dans les *Origines JavaScript autorisées* du client OAuth. Voir le README du backend.

@@ -4,10 +4,12 @@ import { Router, RouterLink } from '@angular/router';
 
 import { errorMessage } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
+import { safeReturnUrl } from '../../core/return-url';
+import { GoogleButton } from '../../shared/google-button';
 
 @Component({
   selector: 'app-login-page',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, GoogleButton],
   template: `
     <div class="card auth-card">
       <div class="brand"><img class="brand-mark" src="logo.svg" alt="" width="34" height="34"> Show Marker</div>
@@ -43,6 +45,8 @@ import { AuthService } from '../../core/auth.service';
         </button>
       </form>
 
+      <app-google-button [returnUrl]="returnUrl()" />
+
       <p class="switch">Pas encore de compte ? <a routerLink="/register">Créer un compte</a></p>
     </div>
   `,
@@ -72,17 +76,11 @@ export class LoginPage {
     this.error.set(null);
     const { email, password } = this.form.getRawValue();
     this.auth.login(email, password).subscribe({
-      next: () => this.router.navigateByUrl(this.safeReturnUrl()),
+      next: () => this.router.navigateByUrl(safeReturnUrl(this.returnUrl())),
       error: (err) => {
         this.loading.set(false);
         this.error.set(errorMessage(err, 'Connexion impossible.'));
       },
     });
-  }
-
-  /** N'accepte que les chemins internes pour éviter les redirections ouvertes. */
-  private safeReturnUrl(): string {
-    const url = this.returnUrl();
-    return url && url.startsWith('/') && !url.startsWith('//') ? url : '/';
   }
 }
