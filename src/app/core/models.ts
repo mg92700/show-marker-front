@@ -161,3 +161,10 @@ export interface ProblemDetail {
   detail?: string;
   errors?: Record<string, string>;
 }
+
+/** État renvoyé par GET /api/health. Si la réponse arrive, le web service est en ligne ; `database` dit si la base répond. */
+export interface HealthReport {
+  status: 'UP' | 'DOWN';
+  database: { status: 'UP' | 'DOWN' };
+  checkedAt: string;
+}
