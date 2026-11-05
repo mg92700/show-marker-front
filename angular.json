@@ -68,7 +68,28 @@
           }
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "coverageInclude": [
+              "src/app/**/*.ts"
+            ],
+            "coverageExclude": [
+              "src/app/**/*.spec.ts",
+              "src/app/**/*.d.ts",
+              "src/app/testing/**"
+            ],
+            "coverageReporters": [
+              "text",
+              "html",
+              "lcov"
+            ],
+            "coverageThresholds": {
+              "statements": 90,
+              "branches": 90,
+              "functions": 90,
+              "lines": 90
+            }
+          }
         }
       }
     }
