@@ -1,20 +1,18 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
+import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
-import { click, httpError, render, submit, text, type } from '../../testing/helpers';
+import { httpError, render, submit, text, type } from '../../testing/helpers';
 import { RegisterPage } from './register.page';
 
 describe('RegisterPage', () => {
   const setup = (auth: Record<string, unknown> = {}) => {
-    const stub = {
-      register: vi.fn(() => of({ message: 'ok' })),
-      resendVerification: vi.fn(() => of({ message: 'Un nouvel e-mail vient d’être envoyé.' })),
-      ...auth,
-    };
-    TestBed.configureTestingModule({ imports: [RegisterPage], providers: [provideRouter([]), { provide: AuthService, useValue: stub }] });
-    return { fixture: TestBed.createComponent(RegisterPage), stub };
+    const stub = { register: vi.fn(() => of({})), providers: vi.fn(() => of({ googleClientId: null })), ...auth };
+    TestBed.configureTestingModule({ imports: [RegisterPage], providers: [provideRouter([]), { provide: AuthService, useValue: stub }, { provide: ApiService, useValue: { showcase: () => of([]) } }] });
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+    return { fixture: TestBed.createComponent(RegisterPage), stub, navigate };
   };
 
   const fill = (el: HTMLElement, o: { name?: string; email?: string; password?: string; confirm?: string } = {}) => {
@@ -49,16 +47,14 @@ describe('RegisterPage', () => {
     expect(text(el)).toContain('Les mots de passe ne correspondent pas.');
   });
 
-  it('crée le compte puis invite à vérifier ses e-mails (sans connexion automatique)', async () => {
-    const { fixture, stub } = setup();
+  it('crée le compte puis redirige vers l’accueil (session ouverte)', async () => {
+    const { fixture, stub, navigate } = setup();
     const el = await render(fixture);
     fill(el);
     submit(el);
     await fixture.whenStable();
     expect(stub.register).toHaveBeenCalledWith('m@x.fr', 'secret123', 'Mouhsin');
-    expect(text(el)).toContain('Vérifiez vos e-mails');
-    expect(text(el)).toContain('m@x.fr');
-    expect(el.querySelector('form')).toBeNull();
+    expect(navigate).toHaveBeenCalledWith('/');
   });
 
   it('affiche l’erreur du serveur (pseudo déjà pris)', async () => {
@@ -69,28 +65,5 @@ describe('RegisterPage', () => {
     await fixture.whenStable();
     expect(text(el)).toContain('Ce pseudo est déjà pris.');
     expect(el.querySelector('form')).not.toBeNull();
-  });
-
-  it('permet de renvoyer l’e-mail de confirmation', async () => {
-    const { fixture, stub } = setup();
-    const el = await render(fixture);
-    fill(el);
-    submit(el);
-    await fixture.whenStable();
-    click(el, 'button.btn-block');
-    await fixture.whenStable();
-    expect(stub.resendVerification).toHaveBeenCalledWith('m@x.fr');
-    expect(text(el)).toContain('Un nouvel e-mail vient d’être envoyé.');
-  });
-
-  it('affiche l’erreur si le renvoi échoue', async () => {
-    const { fixture } = setup({ resendVerification: vi.fn(() => throwError(() => httpError(500))) });
-    const el = await render(fixture);
-    fill(el);
-    submit(el);
-    await fixture.whenStable();
-    click(el, 'button.btn-block');
-    await fixture.whenStable();
-    expect(text(el)).toContain("Impossible de renvoyer l'e-mail.");
   });
 });

@@ -8,7 +8,7 @@ import { authInterceptor } from './auth.interceptor';
 import { AuthService } from './auth.service';
 import { AuthResponse, User } from './models';
 
-const alice: User = { id: 1, email: 'a@b.c', displayName: 'Alice', role: 'USER', createdAt: '2026-01-01T00:00:00Z' };
+const alice: User = { id: 1, email: 'a@b.c', displayName: 'Alice', role: 'USER', createdAt: '2026-01-01T00:00:00Z', hasPassword: true };
 
 describe('Compte : inscription, vérification, mot de passe, profil', () => {
   let auth: AuthService;
@@ -33,41 +33,16 @@ describe('Compte : inscription, vérification, mot de passe, profil', () => {
     return promise;
   };
 
-  it("l'inscription n'ouvre pas de session (l'e-mail doit d'abord être confirmé)", () => {
+  it("l'inscription ouvre directement une session", () => {
     auth.register('a@b.c', 'secret123', 'Alice').subscribe();
     const req = http.expectOne('/api/auth/register');
     expect(req.request.body).toEqual({ email: 'a@b.c', password: 'secret123', displayName: 'Alice' });
-    req.flush({ message: 'Compte créé.' }, { status: 201, statusText: 'Created' });
-    expect(auth.isAuthenticated()).toBe(false);
-  });
-
-  it('envoie le jeton pour confirmer une adresse', () => {
-    auth.verifyEmail('tok').subscribe();
-    const req = http.expectOne('/api/auth/verify-email');
-    expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ token: 'tok' });
-    req.flush(null, { status: 204, statusText: 'No Content' });
-  });
-
-  it('demande un lien de réinitialisation du mot de passe', () => {
-    auth.forgotPassword('a@b.c').subscribe();
-    const req = http.expectOne('/api/auth/forgot-password');
-    expect(req.request.body).toEqual({ email: 'a@b.c' });
-    req.flush({ message: 'ok' });
-  });
-
-  it('réinitialise le mot de passe avec le jeton', () => {
-    auth.resetPassword('tok', 'new-secret-456').subscribe();
-    const req = http.expectOne('/api/auth/reset-password');
-    expect(req.request.body).toEqual({ token: 'tok', newPassword: 'new-secret-456' });
-    req.flush(null, { status: 204, statusText: 'No Content' });
-  });
-
-  it('renvoie le mail de confirmation', () => {
-    auth.resendVerification('a@b.c').subscribe();
-    const req = http.expectOne('/api/auth/resend-verification');
-    expect(req.request.body).toEqual({ email: 'a@b.c' });
-    req.flush({ message: 'ok' });
+    req.flush(
+      { user: alice, expiresAt: new Date(Date.now() + 3_600_000).toISOString() },
+      { status: 201, statusText: 'Created' },
+    );
+    expect(auth.isAuthenticated()).toBe(true);
+    expect(auth.user()?.displayName).toBe('Alice');
   });
 
   it('met à jour le pseudo affiché après modification du profil', async () => {
@@ -93,14 +68,5 @@ describe('Compte : inscription, vérification, mot de passe, profil', () => {
     account.changePassword('wrong', 'new-secret-456').subscribe({ error: () => undefined });
     http.expectOne('/api/account/password').flush({ status: 400, detail: 'Le mot de passe actuel est incorrect.' }, { status: 400, statusText: 'Bad Request' });
     expect(auth.isAuthenticated()).toBe(true);
-  });
-
-  it("demande le changement d'e-mail avec le mot de passe actuel", async () => {
-    await startSession();
-    account.changeEmail('new@b.c', 'secret123').subscribe();
-    const req = http.expectOne('/api/account/email');
-    expect(req.request.body).toEqual({ newEmail: 'new@b.c', currentPassword: 'secret123' });
-    req.flush({ message: 'Un e-mail de confirmation vient d’être envoyé.' }, { status: 202, statusText: 'Accepted' });
-    expect(auth.user()?.email).toBe('a@b.c'); // inchangé tant que la nouvelle adresse n'est pas confirmée
   });
 });

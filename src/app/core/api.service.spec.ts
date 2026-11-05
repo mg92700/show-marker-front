@@ -2,7 +2,7 @@ import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { ApiService, errorCode, errorMessage } from './api.service';
+import { ApiService, errorMessage } from './api.service';
 
 describe('ApiService', () => {
   let api: ApiService;
@@ -19,6 +19,13 @@ describe('ApiService', () => {
   it('interroge le statut du catalogue', () => {
     api.catalogStatus().subscribe();
     expect(http.expectOne('/api/catalog/status').request.method).toBe('GET');
+  });
+
+  it('charge les affiches de titres cultes', () => {
+    let result: unknown;
+    api.showcase().subscribe((items) => (result = items));
+    http.expectOne('/api/catalog/showcase').flush([{ title: 'Dark', posterUrl: 'https://img/dark.jpg' }]);
+    expect(result).toEqual([{ title: 'Dark', posterUrl: 'https://img/dark.jpg' }]);
   });
 
   it('recherche des séries et des films avec le terme en paramètre', () => {
@@ -92,7 +99,7 @@ describe('ApiService', () => {
   });
 });
 
-describe('errorMessage / errorCode', () => {
+describe('errorMessage', () => {
   const httpError = (status: number, error: unknown) => new HttpErrorResponse({ status, error });
 
   it('signale un serveur injoignable (statut 0)', () => {
@@ -112,11 +119,5 @@ describe('errorMessage / errorCode', () => {
     expect(errorMessage(httpError(500, null), 'Oups')).toBe('Oups');
     expect(errorMessage(httpError(500, {}))).toBe('Une erreur est survenue.');
     expect(errorMessage(new Error('x'))).toBe('Une erreur est survenue.');
-  });
-
-  it('expose le code machine du backend', () => {
-    expect(errorCode(httpError(403, { code: 'EMAIL_NOT_VERIFIED' }))).toBe('EMAIL_NOT_VERIFIED');
-    expect(errorCode(httpError(403, null))).toBeUndefined();
-    expect(errorCode(new Error('x'))).toBeUndefined();
   });
 });

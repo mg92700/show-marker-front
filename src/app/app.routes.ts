@@ -16,23 +16,6 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/auth/register.page').then((m) => m.RegisterPage),
   },
   {
-    path: 'forgot-password',
-    canActivate: [guestGuard],
-    title: 'Mot de passe oublié · Show Marker',
-    loadComponent: () => import('./pages/auth/forgot-password.page').then((m) => m.ForgotPasswordPage),
-  },
-  // Pages ouvertes depuis un lien d'e-mail : accessibles connecté ou non.
-  {
-    path: 'reset-password',
-    title: 'Nouveau mot de passe · Show Marker',
-    loadComponent: () => import('./pages/auth/reset-password.page').then((m) => m.ResetPasswordPage),
-  },
-  {
-    path: 'verify-email',
-    title: 'Confirmation de l’e-mail · Show Marker',
-    loadComponent: () => import('./pages/auth/verify-email.page').then((m) => m.VerifyEmailPage),
-  },
-  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('./layout/shell').then((m) => m.Shell),

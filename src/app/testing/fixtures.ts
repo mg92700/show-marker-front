@@ -16,6 +16,7 @@ export const makeUser = (o: Partial<User> = {}): User => ({
   displayName: 'Alice',
   role: 'USER',
   createdAt: '2026-01-01T00:00:00Z',
+  hasPassword: true,
   ...o,
 });
 

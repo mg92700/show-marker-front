@@ -9,11 +9,13 @@ export interface User {
   displayName: string;
   role: string;
   createdAt: string;
+  /** Faux pour un compte créé via Google (aucun mot de passe à gérer). */
+  hasPassword: boolean;
 }
 
-/** Réponse générique du backend (ne révèle jamais si une adresse existe). */
-export interface MessageResponse {
-  message: string;
+/** Fournisseurs de connexion externes ; `googleClientId` est null si Google n'est pas configuré côté backend. */
+export interface AuthProviders {
+  googleClientId: string | null;
 }
 
 export interface AuthResponse {
@@ -82,6 +84,12 @@ export interface MovieDetails {
   runtime: number | null;
   genres: string[];
   rating: number | null;
+}
+
+/** Affiche d'un titre culte, utilisée pour habiller les pages publiques. */
+export interface ShowcaseItem {
+  title: string;
+  posterUrl: string;
 }
 
 export interface CatalogStatus {
@@ -164,8 +172,6 @@ export interface ProblemDetail {
   status: number;
   title?: string;
   detail?: string;
-  /** Code machine optionnel, ex. EMAIL_NOT_VERIFIED. */
-  code?: string;
   errors?: Record<string, string>;
 }
 

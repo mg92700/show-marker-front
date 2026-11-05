@@ -14,6 +14,7 @@ import {
   MovieDetails,
   ProblemDetail,
   ShowDetails,
+  ShowcaseItem,
 } from './models';
 
 /** Accès typé à l'API REST du backend (catalogue, bibliothèque, tableau de bord). */
@@ -25,6 +26,11 @@ export class ApiService {
   // --- Catalogue
   catalogStatus(): Observable<CatalogStatus> {
     return this.http.get<CatalogStatus>(`${this.api}/catalog/status`);
+  }
+
+  /** Affiches de titres cultes (public, sert de fond aux pages de connexion). */
+  showcase(): Observable<ShowcaseItem[]> {
+    return this.http.get<ShowcaseItem[]>(`${this.api}/catalog/showcase`);
   }
 
   searchShows(query: string): Observable<MediaSummary[]> {
@@ -91,9 +97,4 @@ export function errorMessage(error: unknown, fallback = 'Une erreur est survenue
     if (problem?.detail) return problem.detail;
   }
   return fallback;
-}
-
-/** Code machine d'une erreur du backend (ex. EMAIL_NOT_VERIFIED), s'il y en a un. */
-export function errorCode(error: unknown): string | undefined {
-  return error instanceof HttpErrorResponse ? (error.error as ProblemDetail | null)?.code : undefined;
 }

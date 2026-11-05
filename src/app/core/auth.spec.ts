@@ -9,7 +9,7 @@ import { AuthService } from './auth.service';
 import { AuthResponse } from './models';
 
 const session = (offsetMs = 3_600_000): AuthResponse => ({
-  user: { id: 1, email: 'a@b.c', displayName: 'Alice', role: 'USER', createdAt: '2026-01-01T00:00:00Z' },
+  user: { id: 1, email: 'a@b.c', displayName: 'Alice', role: 'USER', createdAt: '2026-01-01T00:00:00Z', hasPassword: true },
   expiresAt: new Date(Date.now() + offsetMs).toISOString(),
 });
 
@@ -96,6 +96,23 @@ describe('Authentification', () => {
     auth.logout();
     http.expectOne('/api/auth/logout').flush(null, { status: 204, statusText: 'No Content' });
     expect(auth.isAuthenticated()).toBe(false);
+  });
+
+  it('loginWithGoogle ouvre une session avec le jeton Google', () => {
+    auth.loginWithGoogle('jeton').subscribe();
+    const req = http.expectOne('/api/auth/google');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ credential: 'jeton' });
+    expect(req.request.withCredentials).toBe(true);
+    req.flush(session());
+    expect(auth.isAuthenticated()).toBe(true);
+  });
+
+  it('providers lit les fournisseurs de connexion disponibles', () => {
+    let result: unknown;
+    auth.providers().subscribe((p) => (result = p));
+    http.expectOne('/api/auth/providers').flush({ googleClientId: 'client-123' });
+    expect(result).toEqual({ googleClientId: 'client-123' });
   });
 
   it('authGuard redirige vers /login avec returnUrl si non connecté', () => {

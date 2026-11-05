@@ -4,9 +4,9 @@ import { Observable, tap } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
-import { MessageResponse, User } from './models';
+import { User } from './models';
 
-/** Modification du compte par son propriétaire : pseudo, mot de passe, adresse e-mail. */
+/** Modification du compte par son propriétaire : pseudo et mot de passe. */
 @Injectable({ providedIn: 'root' })
 export class AccountService {
   private readonly http = inject(HttpClient);
@@ -22,10 +22,5 @@ export class AccountService {
 
   changePassword(currentPassword: string, newPassword: string): Observable<void> {
     return this.http.put<void>(`${this.api}/password`, { currentPassword, newPassword });
-  }
-
-  /** Demande un changement d'adresse : la nouvelle adresse doit être confirmée par e-mail avant d'être appliquée. */
-  changeEmail(newEmail: string, currentPassword: string): Observable<MessageResponse> {
-    return this.http.post<MessageResponse>(`${this.api}/email`, { newEmail, currentPassword });
   }
 }
